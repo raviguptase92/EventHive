@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: notification-service
+  pulsar:
+    client:
+      service-url: pulsar://${PULSAR_HOST:localhost}:6650
+
+server:
+  shutdown: graceful
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+logging:
+  level:
+    com.eventhive: INFO

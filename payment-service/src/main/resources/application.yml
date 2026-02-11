@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/payment_db
+    username: ${POSTGRES_USER:payment}
+    password: ${POSTGRES_PASSWORD:payment}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  pulsar:
+    client:
+      service-url: pulsar://${PULSAR_HOST:localhost}:6650
+    consumer:
+      ack-timeout: 30s
+
+server:
+  shutdown: graceful
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+logging:
+  level:
+    com.eventhive: INFO
+    org.springframework.pulsar: INFO

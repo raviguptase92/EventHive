@@ -1,0 +1,132 @@
+version: "3.9"
+
+services:
+  pulsar:
+    image: apachepulsar/pulsar:3.2.0
+    container_name: eventhive-pulsar
+    command: bin/pulsar standalone
+    ports:
+      - "6650:6650"   # broker
+      - "8080:8080"   # HTTP
+    environment:
+      PULSAR_MEM: -Xms512m -Xmx512m -XX:MaxDirectMemorySize=256m
+    healthcheck:
+      test: ["CMD", "bin/pulsar-admin", "brokers", "healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: eventhive-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    container_name: eventhive-order-service
+    depends_on:
+      pulsar:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: order
+      POSTGRES_PASSWORD: order
+      PULSAR_HOST: pulsar
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health/liveness"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    container_name: eventhive-payment-service
+    depends_on:
+      pulsar:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: payment
+      POSTGRES_PASSWORD: payment
+      PULSAR_HOST: pulsar
+    ports:
+      - "8082:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health/liveness"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: inventory-service/Dockerfile
+    container_name: eventhive-inventory-service
+    depends_on:
+      pulsar:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: inventory
+      POSTGRES_PASSWORD: inventory
+      PULSAR_HOST: pulsar
+    ports:
+      - "8083:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health/liveness"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: eventhive-notification-service
+    depends_on:
+      pulsar:
+        condition: service_healthy
+    environment:
+      PULSAR_HOST: pulsar
+    ports:
+      - "8084:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health/liveness"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  postgres_data:

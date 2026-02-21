@@ -5,7 +5,7 @@ import org.apache.pulsar.client.api.ConsumerBuilder;
 import org.apache.pulsar.client.api.DeadLetterPolicy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.pulsar.core.ConsumerBuilderCustomizer;
+import org.springframework.pulsar.annotation.PulsarListenerConsumerBuilderCustomizer;
 
 import java.util.concurrent.TimeUnit;
 
@@ -21,7 +21,7 @@ public class PulsarConsumerConfig {
     public static final String DEAD_LETTER_TOPIC = "payment-requested-dlq";
 
     @Bean
-    public ConsumerBuilderCustomizer<PaymentRequestedEvent> paymentConsumerCustomizer() {
+    public PulsarListenerConsumerBuilderCustomizer<PaymentRequestedEvent> paymentConsumerCustomizer() {
         return (ConsumerBuilder<PaymentRequestedEvent> builder) -> {
             builder
                 .deadLetterPolicy(DeadLetterPolicy.builder()

@@ -1,7 +1,7 @@
 -- Order Service
-CREATE USER order WITH PASSWORD 'order';
-CREATE DATABASE order_db OWNER order;
-GRANT ALL PRIVILEGES ON DATABASE order_db TO order;
+CREATE USER order_user WITH PASSWORD 'order_pwd';
+CREATE DATABASE order_db OWNER order_user;
+GRANT ALL PRIVILEGES ON DATABASE order_db TO order_user;
 
 -- Payment Service
 CREATE USER payment WITH PASSWORD 'payment';

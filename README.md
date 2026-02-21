@@ -18,6 +18,15 @@ A **Scalable Order Processing System** built with Spring Boot, Apache Pulsar, Po
 | **Inventory Service** | 8083 | Reserve inventory (Key_Shared + Shared subscriptions) |
 | **Notification Service** | 8084 | Consume events, send (log) notifications           |
 
+### API documentation (Swagger)
+
+Order Service exposes **OpenAPI 3** docs and **Swagger UI**:
+
+- **Swagger UI:** http://localhost:8081/swagger-ui.html  
+- **OpenAPI JSON:** http://localhost:8081/v3/api-docs  
+
+Use Swagger UI to try the *Create an order* endpoint with example payloads.
+
 ## Architect-Level Features
 
 - **Key_Shared vs Shared subscription** – Inventory service uses both on `order-created` to compare ordering per key vs maximum throughput.
@@ -111,6 +120,4 @@ EventHive/
 └── notification-service/
 ```
 
-## License
 
-MIT.

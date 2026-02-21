@@ -3,8 +3,8 @@ spring:
     name: order-service
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/order_db
-    username: ${POSTGRES_USER:order}
-    password: ${POSTGRES_PASSWORD:order}
+    username: ${POSTGRES_USER:order_user}
+    password: ${POSTGRES_PASSWORD:order_pwd}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -18,6 +18,16 @@ spring:
 
 server:
   shutdown: graceful
+  port: 8081
+
+# Swagger / OpenAPI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
 
 management:
   endpoint:

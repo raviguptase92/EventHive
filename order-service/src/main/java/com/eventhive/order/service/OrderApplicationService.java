@@ -30,7 +30,7 @@ public class OrderApplicationService {
 
     @Transactional
     public OrderResponse createOrder(CreateOrderRequest request) {
-        // Idempotency: return existing order if same idempotency key
+        // Idempotency: return existing order if the same idempotency key
         var existing = orderRepository.findByIdempotencyKey(request.idempotencyKey());
         if (existing.isPresent()) {
             return toResponse(existing.get());
@@ -43,7 +43,7 @@ public class OrderApplicationService {
         var order = new OrderEntity();
         order.setCustomerId(request.customerId());
         order.setAmount(total);
-        order.setCurrency("USD");
+        order.setCurrency("INR");
         order.setStatus("CREATED");
         order.setIdempotencyKey(request.idempotencyKey());
         order.setCreatedAt(Instant.now());
@@ -58,10 +58,9 @@ public class OrderApplicationService {
         }
 
         order = orderRepository.save(order);
-
         List<OrderItemDto> itemDtos = order.getItems().stream()
             .map(i -> new OrderItemDto(i.getProductId(), i.getQuantity(), i.getUnitPrice()))
-            .collect(Collectors.toList());
+            .toList();
 
         OrderCreatedEvent orderEvent = new OrderCreatedEvent(
             order.getId(),
@@ -84,7 +83,6 @@ public class OrderApplicationService {
             "payment-" + order.getIdempotencyKey()
         );
         eventPublisher.publishPaymentRequested(paymentEvent);
-
         return toResponse(order);
     }
 

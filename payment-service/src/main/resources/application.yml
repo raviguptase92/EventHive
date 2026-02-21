@@ -18,6 +18,7 @@ spring:
 
 server:
   shutdown: graceful
+  port: 8082
 
 management:
   endpoint:
